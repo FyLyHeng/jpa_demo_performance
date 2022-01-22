@@ -6,12 +6,10 @@ import com.example.jpa.jpa_demo_performance.dto.pageable.AuthorPageableWithTotal
 import com.example.jpa.jpa_demo_performance.model.Author
 import com.example.jpa.jpa_demo_performance.model.Book
 import com.example.jpa.jpa_demo_performance.repository.AuthorRepo
+import com.example.jpa.jpa_demo_performance.repository.BookRepo
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.*
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RequestParam
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 import java.util.*
 import javax.persistence.criteria.Join
 import javax.persistence.criteria.JoinType
@@ -24,6 +22,13 @@ class AuthorController {
     @Autowired
     lateinit var authorRepo: AuthorRepo
 
+    @Autowired
+    lateinit var bookRepo: BookRepo
+
+    @GetMapping("{id}")
+    fun get (@PathVariable id:Long): Author {
+        return authorRepo.getById(id)
+    }
 
     @GetMapping("/a")
     fun getA (): MutableList<Author> {
@@ -88,21 +93,24 @@ class AuthorController {
 
 
     @GetMapping("/criteria")
-    fun findAllCriteria (@RequestParam allParams : MutableMap<String, String>): Page<AuthorPageable> {
+    fun findAllCriteria (@RequestParam allParams : MutableMap<String, String>): Page<AuthorDto>? {
 
         val authorName = allParams["author"]
         val page = allParams["page"]?.toInt() ?: 0
         val size : Int = allParams["size"]?.toInt() ?:10
 
-        val rs = authorRepo.findAll({ root, _, cb ->
+        val rs = authorRepo.findAll({ root, cq, cb ->
             val predicates = ArrayList<Predicate>()
+            val book : Join<Objects, Objects> = root.join("books",JoinType.LEFT)
+            cq.multiselect(root,book)
+            cq.distinct(true)
 
             authorName?.let {
                 val cusId = cb.equal(root.get<String>("name"), authorName)
                 predicates.add(cusId)
             }
             cb.and(*predicates.toTypedArray())
-        }, AuthorPageable::class.java,PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "id")))
+        }, AuthorDto::class.java,PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "id")))
         return rs
     }
 
@@ -118,6 +126,7 @@ class AuthorController {
 
             val book : Join<Objects, Objects> = root.join("books",JoinType.LEFT)
             cq.multiselect(root,book)
+            cq.distinct(true)
 
             authorName?.let {
                 val cusId = cb.equal(root.get<String>("name"), authorName)
@@ -129,12 +138,32 @@ class AuthorController {
     }
 
 
-    @GetMapping("/dynamic")
-    fun dynamicSelect (): MutableList<AuthorPageable>? {
 
 
-        val fieldSelect = "a.name as authorName, a.email as authorEmail"
-        return authorRepo.select(fieldSelect)
+//=====================================================================================
+    /**
+     *
+     *
+     */
+
+    @GetMapping("/exist")
+    fun dynamicSelect (@RequestParam param : Map<String,String>): Map<String, Example<Book>> {
+
+        val book = Book(
+                title = param["title"].toString(),
+                isDelete = param["isDelete"].toBoolean()
+        )
+
+
+        //matchingAny (or)
+        //matchingAll (and)
+
+        val ex  = Example.of(book, ExampleMatcher.matchingAll()
+                .withIgnorePaths("price","id").withIgnoreCase()
+        )
+
+
+        return mapOf("isExist ${bookRepo.exists(ex)}" to ex)
     }
 
 

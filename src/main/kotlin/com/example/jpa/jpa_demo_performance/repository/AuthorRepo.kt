@@ -4,6 +4,7 @@ import com.example.jpa.jpa_demo_performance.dto.AuthorPageable
 import com.example.jpa.jpa_demo_performance.dto.pageable.AuthorPageableWithTotalCount
 import com.example.jpa.jpa_demo_performance.model.Author
 import com.example.jpa.jpa_demo_performance.model.Book
+import org.hibernate.jpa.QueryHints.HINT_PASS_DISTINCT_THROUGH
 import org.springframework.data.domain.Page
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
@@ -11,9 +12,11 @@ import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Slice
 import org.springframework.data.jpa.domain.Specification
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor
+import org.springframework.data.jpa.repository.QueryHints
 import org.springframework.stereotype.Repository
 import org.springframework.transaction.annotation.Transactional
 import th.co.geniustree.springdata.jpa.repository.JpaSpecificationExecutorWithProjection
+import javax.persistence.QueryHint
 
 @Repository
 interface AuthorRepo : JpaRepository<Author, Long>, JpaSpecificationExecutor<Author>, JpaSpecificationExecutorWithProjection<Author> {
@@ -95,6 +98,22 @@ interface AuthorRepo : JpaRepository<Author, Long>, JpaSpecificationExecutor<Aut
     fun select (fieldName: String): MutableList<AuthorPageable>?
 
 
-    @Query("select a.name as authorName, a.email as authorEmail, b.title as bookTitle, b.price as bookPrice from Author a left join a.books b ")
-    fun <R : Any?> findAllPage(p0: Specification<Author>?, p1: Class<R>?, p2: Pageable?): Page<R>
+    /**
+     * default findAll(spe)
+     */
+    @QueryHints(value = [QueryHint(name = HINT_PASS_DISTINCT_THROUGH, value = "false")])
+    override fun findAll(spec: Specification<Author>?, pageable: Pageable): Page<Author>
+
+
+
+    /**
+     * Custom inject Dependency
+     */
+    //@Query("select a.name as authorName, a.email as authorEmail, b.title as bookTitle, b.price as bookPrice from Author a left join a.books b ")
+    @QueryHints(value = [QueryHint(name = HINT_PASS_DISTINCT_THROUGH, value = "false")])
+    override fun <R : Any?> findAll(p0: Specification<Author>?, p1: Class<R>?, p2: Pageable?): Page<R>
+
+
+
+
 }

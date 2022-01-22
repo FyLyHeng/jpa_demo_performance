@@ -1,15 +1,21 @@
 package com.example.jpa.jpa_demo_performance.repository
 
-import com.example.jpa.jpa_demo_performance.model.Author
 import com.example.jpa.jpa_demo_performance.model.Book
+import com.example.jpa.jpa_demo_performance.model.BookStatus
+import org.hibernate.LockOptions
+import org.springframework.data.domain.Sort
 import org.springframework.data.jpa.repository.JpaRepository
-import org.springframework.data.jpa.repository.JpaSpecificationExecutor
-import org.springframework.data.jpa.repository.Query
+import org.springframework.data.jpa.repository.Lock
+import org.springframework.data.jpa.repository.QueryHints
+import org.springframework.stereotype.Repository
+import javax.persistence.LockModeType
+import javax.persistence.QueryHint
 
-interface BookRepo : JpaRepository<Author, Long>, JpaSpecificationExecutor<Book> {
 
+@Repository
+interface BookRepo : JpaRepository<Book, Long>{
 
-//    @Query("update Book b set b.isDelete = true where b.isDelete = false and b.id in(?1) ")
-//    fun delete (ids:List<Book>):MutableList<Book>
-
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @QueryHints(value = [QueryHint(name = "javax.persistence.lock.timeout", value = "" + LockOptions.SKIP_LOCKED)])
+    fun findTop3ByStatus(status: BookStatus?, sort: Sort?): MutableList<Book>?
 }
