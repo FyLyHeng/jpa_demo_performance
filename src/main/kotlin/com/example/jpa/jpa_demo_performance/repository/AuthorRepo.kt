@@ -6,16 +6,14 @@ import com.example.jpa.jpa_demo_performance.model.Author
 import com.example.jpa.jpa_demo_performance.model.Book
 import org.hibernate.jpa.QueryHints.HINT_PASS_DISTINCT_THROUGH
 import org.springframework.data.domain.Page
-import org.springframework.data.jpa.repository.JpaRepository
-import org.springframework.data.jpa.repository.Query
 import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Slice
 import org.springframework.data.jpa.domain.Specification
-import org.springframework.data.jpa.repository.JpaSpecificationExecutor
-import org.springframework.data.jpa.repository.QueryHints
+import org.springframework.data.jpa.repository.*
 import org.springframework.stereotype.Repository
 import org.springframework.transaction.annotation.Transactional
 import th.co.geniustree.springdata.jpa.repository.JpaSpecificationExecutorWithProjection
+import javax.persistence.LockModeType
 import javax.persistence.QueryHint
 
 @Repository
@@ -116,4 +114,9 @@ interface AuthorRepo : JpaRepository<Author, Long>, JpaSpecificationExecutor<Aut
 
 
 
+
+    @Transactional
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("delete from Author a where a.id =?1")
+    fun deleteVaiBatch (id:Long)
 }
