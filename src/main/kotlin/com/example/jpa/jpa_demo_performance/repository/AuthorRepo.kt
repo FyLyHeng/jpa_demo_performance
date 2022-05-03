@@ -99,15 +99,16 @@ interface AuthorRepo : JpaRepository<Author, Long>, JpaSpecificationExecutor<Aut
     /**
      * default findAll(spe)
      */
-    @QueryHints(value = [QueryHint(name = HINT_PASS_DISTINCT_THROUGH, value = "false")])
-    override fun findAll(spec: Specification<Author>?, pageable: Pageable): Page<Author>
+//    @QueryHints(value = [QueryHint(name = HINT_PASS_DISTINCT_THROUGH, value = "false")])
+//    override fun findAll(spec: Specification<Author>?, pageable: Pageable): Page<Author>
 
 
 
     /**
      * Custom inject Dependency
      */
-    //@Query("select a.name as authorName, a.email as authorEmail, b.title as bookTitle, b.price as bookPrice from Author a left join a.books b ")
+//    @Query("select a.name as authorName, a.email as authorEmail, b.title as bookTitle, b.price as bookPrice from Author a left join a.books b ")
+//    @Query("select a from Author a join fetch a.books b")
     @QueryHints(value = [QueryHint(name = HINT_PASS_DISTINCT_THROUGH, value = "false")])
     override fun <R : Any?> findAll(p0: Specification<Author>?, p1: Class<R>?, p2: Pageable?): Page<R>
 

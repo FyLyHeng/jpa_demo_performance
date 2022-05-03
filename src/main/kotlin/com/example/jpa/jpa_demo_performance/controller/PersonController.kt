@@ -19,12 +19,8 @@ class PersonController {
     lateinit var personRepo: PersonRepo
 
     @GetMapping("{id}")
-    fun get (@PathVariable id:Long): Person {
-
-        val p = personRepo.getById(id)
-        p.readingBook = null
-
-        return p
+    fun get(@PathVariable id: Long): Person {
+        return personRepo.getById(id)
     }
 
     @GetMapping("wap/{id}")

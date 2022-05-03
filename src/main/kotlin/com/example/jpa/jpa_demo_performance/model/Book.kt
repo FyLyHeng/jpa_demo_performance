@@ -40,15 +40,14 @@ data class Book(
 
 
         @JsonBackReference
-        @ManyToOne(fetch = FetchType.LAZY)
-        @JoinColumn(name = "author_id", referencedColumnName = "id")
-        @OptimisticLock(excluded = true)
+        @ManyToOne
+        @JoinColumn(name = "author_id", insertable = true, updatable = false,nullable = true)
         var author: Author? = null,
 
 
-        @JsonBackReference
-        @ManyToOne(fetch = FetchType.EAGER)
-        @JoinColumn(name = "person_id", referencedColumnName = "id")
-        @OptimisticLock(excluded = true)
-        var person: Person? = null,
+//        @JsonBackReference
+//        @ManyToOne(fetch = FetchType.LAZY)
+//        @JoinColumn(name = "person_id", referencedColumnName = "id")
+//        @OptimisticLock(excluded = true)
+//        var person: Person? = null,
 ) : Serializable

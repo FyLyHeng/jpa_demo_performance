@@ -28,9 +28,9 @@ data class Person(
         @Basic(fetch = FetchType.LAZY)
         var country: String?=null,
 
-        @Where(clause = "is_delete = false")
-        @JsonManagedReference
-        @OneToMany(mappedBy = "person", cascade = [ CascadeType.MERGE, CascadeType.REFRESH], fetch = FetchType.EAGER)
-        var readingBook : MutableList<Book> ? = null,
+//        @Where(clause = "is_delete = false")
+//        @JsonManagedReference
+//        @OneToMany(mappedBy = "person", cascade = [ CascadeType.MERGE, CascadeType.REFRESH], fetch = FetchType.LAZY)
+//        var readingBook : MutableList<Book> ? = null,
 
 ) : Serializable

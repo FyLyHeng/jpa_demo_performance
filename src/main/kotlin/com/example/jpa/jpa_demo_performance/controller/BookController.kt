@@ -17,13 +17,10 @@ class BookController {
 
     @Autowired
     lateinit var service: BookService
-
     @Autowired
     lateinit var authorService: AuthorService
-
     @Autowired
     lateinit var bookRepo: BookRepo
-
     @Autowired
     lateinit var authorRepo: AuthorRepo
 

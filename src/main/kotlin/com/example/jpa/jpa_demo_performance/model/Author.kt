@@ -28,7 +28,7 @@ data class Author(
 
         @Where(clause = "is_delete = false")
         @JsonManagedReference
-        @OneToMany(mappedBy = "author", cascade = [ CascadeType.MERGE, CascadeType.REFRESH], fetch = FetchType.LAZY)
-        @OptimisticLock(excluded = true)// not incres version when child entity have mordify
+        @OneToMany(targetEntity = Book::class, cascade = [CascadeType.ALL], fetch = FetchType.LAZY, orphanRemoval = true)
+        @JoinColumn(name = "author_id",referencedColumnName = "id")
         var books: MutableList<Book>? = mutableListOf()
 ) : Serializable
